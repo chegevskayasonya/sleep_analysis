@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Сновидець — аналіз снів з ШІ</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0a0812;
+    --bg2: #110f1c;
+    --bg3: #1a1728;
+    --surface: #1e1b2e;
+    --border: rgba(160,140,220,0.13);
+    --accent: #b89cf0;
+    --accent2: #7c5cbf;
+    --accent3: #e8d5ff;
+    --text: #e8e2f5;
+    --muted: #8b82a8;
+    --danger: #f08080;
+    --success: #7ddba8;
+    --glow: rgba(184,156,240,0.18);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── STARS BG ── */
+  .stars-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(120,80,200,0.22) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 80% 80%, rgba(80,50,160,0.12) 0%, transparent 60%);
+  }
+  .stars-bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 35% 10%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 60% 30%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 25% 70%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 90%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 10% 50%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 55% 55%, rgba(200,180,255,0.4) 0%, transparent 100%);
+    animation: twinkle 8s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle { 0% { opacity: 0.7; } 100% { opacity: 1; } }
+
+  /* ── LAYOUT ── */
+  #app { position: relative; z-index: 1; min-height: 100vh; }
+
+  /* ── NAV ── */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,8,18,0.7);
+    backdrop-filter: blur(16px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem; font-weight: 600; letter-spacing: 0.05em;
+    color: var(--accent3);
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    text-decoration: none;
+  }
+  .nav-logo span { font-size: 1.3rem; }
+  .nav-right { display: flex; gap: 12px; align-items: center; }
+  .btn {
+    padding: 9px 22px; border-radius: 50px; border: none; cursor: pointer;
+    font-family: 'Jost', sans-serif; font-size: 0.85rem; font-weight: 500;
+    transition: all 0.25s;
+  }
+  .btn-ghost {
+    background: transparent; color: var(--muted); border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff; box-shadow: 0 4px 20px rgba(124,92,191,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(124,92,191,0.5); }
+  .btn-sm { padding: 6px 16px; font-size: 0.8rem; }
+  .btn-danger { background: rgba(240,128,128,0.15); color: var(--danger); border: 1px solid rgba(240,128,128,0.25); }
+  .btn-danger:hover { background: rgba(240,128,128,0.25); }
+
+  /* ── PAGES ── */
+  .page { display: none; animation: fadeIn 0.4s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: calc(100vh - 65px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 60px 20px;
+  }
+  .hero-eyebrow {
+    font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 20px; opacity: 0.85;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.8rem, 8vw, 6rem);
+    font-weight: 300; line-height: 1.05;
+    color: var(--accent3);
+    margin-bottom: 24px;
+  }
+  .hero-title em { font-style: italic; color: var(--accent); }
+  .hero-sub {
+    font-size: 1rem; color: var(--muted); max-width: 500px;
+    line-height: 1.7; margin-bottom: 44px;
+  }
+  .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  .moon-deco {
+    font-size: 5rem; margin-bottom: 28px;
+    filter: drop-shadow(0 0 40px rgba(184,156,240,0.5));
+    animation: moonFloat 6s ease-in-out infinite;
+  }
+  @keyframes moonFloat {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-12px) rotate(5deg); }
+  }
+  .features {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px; max-width: 820px; margin: 60px auto 0; padding: 0 20px;
+  }
+  .feature-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px 24px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .feature-card:hover { border-color: var(--accent2); transform: translateY(-4px); }
+  .feature-icon { font-size: 2rem; margin-bottom: 14px; }
+  .feature-card h3 {
+    font-family: 'Cormorant Garamond', serif; font-size: 1.2rem;
+    color: var(--accent3); margin-bottom: 8px;
+  }
+  .feature-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── ANALYZE PAGE ── */
+  .analyze-wrap {
+    max-width: 760px; margin: 0 auto; padding: 48px 20px 80px;
+  }
+  .section-header {
+    text-align: center; margin-bottom: 36px;
+  }
+  .section-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem; color: var(--accent3); font-weight: 300;
+  }
+  .section-header p { color: var(--muted); margin-top: 8px; font-size: 0.9rem; }
+
+  .dream-textarea {
+    width: 100%; min-height: 160px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; color: var(--text);
+    font-family: 'Jost', sans-serif; font-size: 0.95rem;
+    padding: 18px 20px; resize: vertical;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    line-height: 1.7;
+  }
+  .dream-textarea::placeholder { color: var(--muted); }
+  .dream-textarea:focus {
+    outline: none; border-color: var(--accent2);
+    box-shadow: 0 0 0 3px rgba(124,92,191,0.15);
+  }
+  .input-hint { font-size: 0.78rem; color: var(--muted); margin-top: 8px; text-align: right; }
+
+  .analyze-btn {
+    width: 100%; margin-top: 16px; padding: 16px;
+    font-size: 1rem; border-radius: 14px;
+    background: linear-gradient(135deg, #5a3fa0, var(--accent));
+    color: #fff; border: none; cursor: pointer;
+    font-family: 'Jost', sans-serif; font-weight: 500;
+    box-shadow: 0 8px 30px rgba(124,92,191,0.4);
+    transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .analyze-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,92,191,0.55); }
+  .analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ── ANALYSIS RESULT ── */
+  .analysis-result {
+    margin-top: 40px; display: none;
+    animation: fadeIn 0.5s ease;
+  }
+  .analysis-result.show { display: block; }
+
+  .result-header {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem; color: var(--accent); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+    padding-bottom: 14px; border-bottom: 1px solid var(--border);
+  }
+
+  .result-tabs {
+    display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .tab {
+    padding: 8px 18px; border-radius: 50px; font-size: 0.82rem;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer; transition: all 0.2s;
+    font-family: 'Jost', sans-serif;
+  }
+  .tab.active, .tab:hover {
+    background: var(--accent2); border-color: var(--accent2); color: #fff;
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+  .result-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 18px; padding: 24px 26px; margin-bottom: 16px;
+  }
+  .result-card h3 {
+    font-family: 'Cormorant Garamond', serif; font-size: 1.15rem;
+    color: var(--accent3); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .result-card p, .result-card li {
+    font-size: 0.9rem; color: var(--text); line-height: 1.75;
+    opacity: 0.9;
+  }
+  .result-card ul { padding-left: 20px; }
+  .result-card li { margin-bottom: 6px; }
+
+  .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .tag {
+    padding: 5px 14px; border-radius: 50px; font-size: 0.78rem;
+    background: rgba(124,92,191,0.18); border: 1px solid rgba(184,156,240,0.2);
+    color: var(--accent);
+  }
+
+  .start-chat-btn {
+    width: 100%; margin-top: 24px; padding: 15px;
+    background: var(--bg2); border: 1px solid var(--accent2);
+    color: var(--accent); border-radius: 14px; cursor: pointer;
+    font-family: 'Jost', sans-serif; font-size: 0.95rem; font-weight: 500;
+    transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .start-chat-btn:hover { background: rgba(124,92,191,0.15); transform: translateY(-1px); }
+
+  /* ── CHAT ── */
+  .chat-wrap { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
+  .chat-context {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px 20px; margin-bottom: 24px;
+    font-size: 0.85rem; color: var(--muted); line-height: 1.6;
+  }
+  .chat-context strong { color: var(--accent); font-weight: 500; }
+
+  .chat-messages {
+    display: flex; flex-direction: column; gap: 16px;
+    margin-bottom: 24px; min-height: 200px;
+  }
+  .msg {
+    display: flex; gap: 12px; animation: fadeIn 0.3s ease;
+    max-width: 85%;
+  }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+  }
+  .msg.ai .msg-avatar { background: linear-gradient(135deg, var(--accent2), var(--accent)); }
+  .msg.user .msg-avatar { background: var(--bg3); border: 1px solid var(--border); }
+  .msg-bubble {
+    padding: 13px 18px; border-radius: 18px;
+    font-size: 0.9rem; line-height: 1.7;
+  }
+  .msg.ai .msg-bubble {
+    background: var(--surface); border: 1px solid var(--border);
+    border-top-left-radius: 4px; color: var(--text);
+  }
+  .msg.user .msg-bubble {
+    background: linear-gradient(135deg, var(--accent2), #8b6ad0);
+    color: #fff; border-top-right-radius: 4px;
+  }
+  .msg-time { font-size: 0.7rem; color: var(--muted); margin-top: 6px; }
+  .msg.user .msg-time { text-align: right; }
+
+  .chat-input-row {
+    display: flex; gap: 12px; align-items: flex-end;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 18px; padding: 12px 16px;
+    transition: border-color 0.3s;
+  }
+  .chat-input-row:focus-within { border-color: var(--accent2); }
+  .chat-input {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--text); font-family: 'Jost', sans-serif; font-size: 0.92rem;
+    resize: none; line-height: 1.5; max-height: 120px; min-height: 24px;
+  }
+  .chat-input::placeholder { color: var(--muted); }
+  .send-btn {
+    width: 38px; height: 38px; border-radius: 50%; border: none;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s; font-size: 1rem;
+  }
+  .send-btn:hover { transform: scale(1.08); }
+  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .typing-dot {
+    display: inline-flex; gap: 4px; align-items: center; padding: 4px 0;
+  }
+  .typing-dot span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); animation: bounce 1.2s infinite;
+  }
+  .typing-dot span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)} }
+
+  /* ── CABINET ── */
+  .cabinet-wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+  .cabinet-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 36px; flex-wrap: wrap; gap: 16px;
+  }
+  .cabinet-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem; color: var(--accent3); font-weight: 300;
+  }
+  .cabinet-header p { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+
+  .sessions-grid {
+    display: grid; gap: 16px;
+  }
+  .session-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 18px; padding: 20px 24px; cursor: pointer;
+    transition: all 0.25s;
+    display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start;
+  }
+  .session-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+  .session-date { font-size: 0.75rem; color: var(--muted); margin-bottom: 6px; }
+  .session-dream {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; color: var(--accent3); line-height: 1.4;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .session-meta { font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
+  .session-msgs {
+    font-size: 0.78rem; color: var(--muted); white-space: nowrap; padding-top: 4px;
+  }
+  .empty-state {
+    text-align: center; padding: 80px 20px; color: var(--muted);
+  }
+  .empty-state .icon { font-size: 4rem; margin-bottom: 16px; opacity: 0.5; }
+  .empty-state h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--accent3); margin-bottom: 8px; }
+  .empty-state p { font-size: 0.85rem; }
+
+  /* ── AUTH ── */
+  .auth-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(10,8,18,0.88);
+    backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+  .auth-box {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 24px; padding: 44px 40px;
+    max-width: 420px; width: 100%;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+  .auth-box h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem; color: var(--accent3); margin-bottom: 8px;
+  }
+  .auth-box p { color: var(--muted); font-size: 0.85rem; margin-bottom: 28px; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+  .form-input {
+    width: 100%; padding: 13px 16px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; color: var(--text);
+    font-family: 'Jost', sans-serif; font-size: 0.9rem;
+    transition: border-color 0.3s;
+  }
+  .form-input:focus { outline: none; border-color: var(--accent2); }
+  .form-input::placeholder { color: var(--muted); }
+  .auth-footer { text-align: center; margin-top: 20px; font-size: 0.82rem; color: var(--muted); }
+  .auth-footer a { color: var(--accent); cursor: pointer; text-decoration: none; }
+  .auth-footer a:hover { text-decoration: underline; }
+  .auth-error { color: var(--danger); font-size: 0.82rem; margin-top: -10px; margin-bottom: 10px; display: none; }
+  .auth-error.show { display: block; }
+
+  /* ── SESSION VIEW ── */
+  .session-view-wrap { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.85rem; color: var(--muted); cursor: pointer;
+    margin-bottom: 28px; transition: color 0.2s;
+    background: none; border: none; padding: 0;
+    font-family: 'Jost', sans-serif;
+  }
+  .back-btn:hover { color: var(--accent); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 500;
+    background: var(--surface); border: 1px solid var(--accent2);
+    border-radius: 12px; padding: 14px 20px;
+    font-size: 0.85rem; color: var(--text);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.3s;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ── LOADING SPINNER ── */
+  .spinner {
+    width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── MOBILE ── */
+  @media (max-width: 600px) {
+    nav { padding: 14px 16px; }
+    .nav-logo { font-size: 1.2rem; }
+    .btn { padding: 8px 16px; font-size: 0.8rem; }
+    .hero { padding: 40px 16px; }
+    .hero-title { font-size: 2.5rem; }
+    .moon-deco { font-size: 3.5rem; }
+    .analyze-wrap, .chat-wrap, .cabinet-wrap, .session-view-wrap { padding: 24px 14px 60px; }
+    .auth-box { padding: 28px 20px; }
+    .section-header h1 { font-size: 1.8rem; }
+    .msg { max-width: 95%; }
+    .result-tabs { gap: 6px; }
+    .tab { padding: 7px 13px; font-size: 0.78rem; }
+    .session-card { grid-template-columns: 1fr; }
+    .cabinet-header { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="stars-bg"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="authOverlay" style="display:none;">
+  <div class="auth-box">
+    <div id="loginForm">
+      <h2>🌙 Вхід</h2>
+      <p>Увійдіть до особистого кабінету, щоб зберігати свої сни</p>
+      <div class="form-group">
+        <label>Електронна пошта</label>
+        <input type="email" class="form-input" id="loginEmail" placeholder="your@email.com" />
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input type="password" class="form-input" id="loginPass" placeholder="••••••••" />
+      </div>
+      <div class="auth-error" id="loginError"></div>
+      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:0.95rem;" onclick="doLogin()">Увійти</button>
+      <div class="auth-footer">Немає акаунту? <a onclick="toggleAuth('register')">Зареєструватись</a></div>
+      <div class="auth-footer" style="margin-top:8px"><a onclick="closeAuth()">Закрити</a></div>
+    </div>
+    <div id="registerForm" style="display:none;">
+      <h2>✨ Реєстрація</h2>
+      <p>Створіть акаунт і почніть пізнавати свої сни</p>
+      <div class="form-group">
+        <label>Ім'я</label>
+        <input type="text" class="form-input" id="regName" placeholder="Як вас звати?" />
+      </div>
+      <div class="form-group">
+        <label>Електронна пошта</label>
+        <input type="email" class="form-input" id="regEmail" placeholder="your@email.com" />
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input type="password" class="form-input" id="regPass" placeholder="Мінімум 6 символів" />
+      </div>
+      <div class="auth-error" id="regError"></div>
+      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:0.95rem;" onclick="doRegister()">Зареєструватись</button>
+      <div class="auth-footer">Вже є акаунт? <a onclick="toggleAuth('login')">Увійти</a></div>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" onclick="goPage('home')">
+      <span>🌙</span> Сновидець
+    </a>
+    <div class="nav-right" id="navRight">
+      <button class="btn btn-ghost" onclick="goPage('analyze')">Аналіз сну</button>
+      <button class="btn btn-ghost" id="cabinetBtn" onclick="openCabinet()">Кабінет</button>
+      <button class="btn btn-primary" id="authBtn" onclick="openAuth()">Увійти</button>
+      <span id="userLabel" style="display:none;color:var(--muted);font-size:0.83rem;"></span>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn" style="display:none;" onclick="doLogout()">Вийти</button>
+    </div>
+  </nav>
+
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <section class="hero">
+      <div class="moon-deco">🌙</div>
+      <p class="hero-eyebrow">Дослідження підсвідомого</p>
+      <h1 class="hero-title">Розкрий таємниці<br/>своїх <em>снів</em></h1>
+      <p class="hero-sub">Опиши свій сон — штучний інтелект пояснить символи, знайде зв'язки з реальністю та допоможе розібратись у підсвідомому</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" style="padding:14px 36px;font-size:1rem;" onclick="goPage('analyze')">Аналізувати сон</button>
+        <button class="btn btn-ghost" style="padding:14px 28px;font-size:1rem;" onclick="openCabinet()">Мій кабінет</button>
+      </div>
+    </section>
+    <div class="features">
+      <div class="feature-card">
+        <div class="feature-icon">🔮</div>
+        <h3>Глибокий аналіз</h3>
+        <p>ШІ розбирає символи, архетипи та приховані значення твого сну</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>Діалог зі сном</h3>
+        <p>Постав будь-яке запитання про свій сон і отримай вдумливу відповідь</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📓</div>
+        <h3>Щоденник снів</h3>
+        <p>Всі твої сесії зберігаються в особистому кабінеті</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYZE -->
+  <div class="page" id="page-analyze">
+    <div class="analyze-wrap">
+      <div class="section-header">
+        <h1>✨ Аналіз сну</h1>
+        <p>Опиши свій сон максимально детально — ШІ знайде символи і значення</p>
+      </div>
+      <textarea class="dream-textarea" id="dreamInput" placeholder="Мені снилося... (опишіть деталі: місце, персонажі, події, відчуття, кольори)" oninput="updateCharCount()"></textarea>
+      <p class="input-hint"><span id="charCount">0</span> символів</p>
+      <button class="analyze-btn" id="analyzeBtn" onclick="analyzeDream()">
+        <span id="analyzeBtnText">🔮 Розшифрувати сон</span>
+      </button>
+
+      <div class="analysis-result" id="analysisResult">
+        <div class="result-header">🌙 Аналіз твого сну</div>
+        <div class="result-tabs">
+          <button class="tab active" onclick="switchTab(this,'tab-meaning')">💫 Значення</button>
+          <button class="tab" onclick="switchTab(this,'tab-life')">🔗 Зв'язок з життям</button>
+          <button class="tab" onclick="switchTab(this,'tab-advice')">🌿 Поради</button>
+          <button class="tab" onclick="switchTab(this,'tab-caution')">⚠️ Застереження</button>
+        </div>
+        <div class="tab-content active" id="tab-meaning">
+          <div class="result-card" id="rc-meaning"></div>
+        </div>
+        <div class="tab-content" id="tab-life">
+          <div class="result-card" id="rc-life"></div>
+        </div>
+        <div class="tab-content" id="tab-advice">
+          <div class="result-card" id="rc-advice"></div>
+        </div>
+        <div class="tab-content" id="tab-caution">
+          <div class="result-card" id="rc-caution"></div>
+        </div>
+        <button class="start-chat-btn" onclick="startChat()">
+          💬 Почати діалог про цей сон
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="page" id="page-chat">
+    <div class="chat-wrap">
+      <div class="section-header">
+        <h1>💬 Діалог зі сном</h1>
+        <p>Постав будь-яке запитання про свій сон</p>
+      </div>
+      <div class="chat-context" id="chatContext"></div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="chatInput" placeholder="Запитай про свій сон..." rows="1"
+          onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendChat()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CABINET -->
+  <div class="page" id="page-cabinet">
+    <div class="cabinet-wrap">
+      <div class="cabinet-header">
+        <div>
+          <h1>📓 Щоденник снів</h1>
+          <p id="cabinetSubtitle">Усі збережені сесії аналізу</p>
+        </div>
+        <button class="btn btn-primary" onclick="goPage('analyze')">+ Новий сон</button>
+      </div>
+      <div class="sessions-grid" id="sessionsList"></div>
+    </div>
+  </div>
+
+  <!-- SESSION DETAIL -->
+  <div class="page" id="page-session">
+    <div class="session-view-wrap">
+      <button class="back-btn" onclick="goPage('cabinet')">← Назад до кабінету</button>
+      <div id="sessionDetail"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+let currentUser = null;
+let currentDream = '';
+let currentAnalysis = null;
+let chatHistory = [];
+let currentSessionId = null;
+
+// ── STORAGE ──
+function getUsers() { return JSON.parse(localStorage.getItem('sn_users') || '{}'); }
+function saveUsers(u) { localStorage.setItem('sn_users', JSON.stringify(u)); }
+function getSessions(email) { return JSON.parse(localStorage.getItem('sn_sessions_' + email) || '[]'); }
+function saveSessions(email, sessions) { localStorage.setItem('sn_sessions_' + email, JSON.stringify(sessions)); }
+
+// ── AUTH ──
+function initAuth() {
+  const saved = localStorage.getItem('sn_current');
+  if (saved) {
+    currentUser = JSON.parse(saved);
+    updateNavAuth();
+  }
+}
+function openAuth() {
+  document.getElementById('authOverlay').style.display = 'flex';
+}
+function closeAuth() {
+  document.getElementById('authOverlay').style.display = 'none';
+}
+function toggleAuth(mode) {
+  document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = mode === 'register' ? 'block' : 'none';
+}
+function showAuthError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPass').value;
+  if (!email || !pass) return showAuthError('loginError', 'Заповніть всі поля');
+  const users = getUsers();
+  if (!users[email] || users[email].pass !== btoa(pass))
+    return showAuthError('loginError', 'Невірна пошта або пароль');
+  currentUser = { email, name: users[email].name };
+  localStorage.setItem('sn_current', JSON.stringify(currentUser));
+  updateNavAuth(); closeAuth();
+  showToast('Ласкаво просимо, ' + currentUser.name + '!');
+}
+function doRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('regPass').value;
+  if (!name || !email || !pass) return showAuthError('regError', 'Заповніть всі поля');
+  if (pass.length < 6) return showAuthError('regError', 'Пароль — мінімум 6 символів');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showAuthError('regError', 'Невірний формат пошти');
+  const users = getUsers();
+  if (users[email]) return showAuthError('regError', 'Цей email вже зареєстровано');
+  users[email] = { name, pass: btoa(pass) };
+  saveUsers(users);
+  currentUser = { email, name };
+  localStorage.setItem('sn_current', JSON.stringify(currentUser));
+  updateNavAuth(); closeAuth();
+  showToast('Акаунт створено! Ласкаво просимо, ' + name + '!');
+}
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('sn_current');
+  updateNavAuth();
+  goPage('home');
+  showToast('Ви вийшли з акаунту');
+}
+function updateNavAuth() {
+  const authBtn = document.getElementById('authBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const userLabel = document.getElementById('userLabel');
+  if (currentUser) {
+    authBtn.style.display = 'none';
+    logoutBtn.style.display = 'inline-block';
+    userLabel.style.display = 'inline';
+    userLabel.textContent = currentUser.name;
+  } else {
+    authBtn.style.display = 'inline-block';
+    logoutBtn.style.display = 'none';
+    userLabel.style.display = 'none';
+  }
+}
+
+// ── PAGES ──
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function openCabinet() {
+  if (!currentUser) { openAuth(); return; }
+  renderCabinet();
+  goPage('cabinet');
+}
+
+// ── HELPERS ──
+function updateCharCount() {
+  document.getElementById('charCount').textContent = document.getElementById('dreamInput').value.length;
+}
+function switchTab(btn, tabId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+}
+function now() {
+  return new Date().toLocaleString('uk-UA', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+function htmlify(text) {
+  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+             .replace(/^[-•]\s+/gm, '• ')
+             .replace(/\n/g, '<br>');
+}
+
+// ── ANALYZE ──
+async function analyzeDream() {
+  const dream = document.getElementById('dreamInput').value.trim();
+  if (dream.length < 20) { showToast('Будь ласка, опишіть сон детальніше (мінімум 20 символів)'); return; }
+  currentDream = dream;
+
+  const btn = document.getElementById('analyzeBtn');
+  const btnText = document.getElementById('analyzeBtnText');
+  btn.disabled = true;
+  btnText.innerHTML = '<span class="spinner"></span> Аналізую...';
+
+  const prompt = `Ти — досвідчений аналітик снів, що поєднує юнгівську психологію, символічне тлумачення та практичні поради.
+
+Сон користувача: "${dream}"
+
+Дай відповідь ТІЛЬКИ у форматі JSON (без markdown, без пояснень поза JSON):
+{
+  "meaning": "Детальний аналіз символів і значення сну (3-5 речень)",
+  "symbols": ["символ1", "символ2", "символ3"],
+  "lifeConnection": "З чим у реальному житті може бути пов'язаний цей сон (2-4 речення)",
+  "advice": "Конкретні поради що варто зробити або переосмислити після цього сну (3-5 речень)",
+  "caution": "На що варто звернути увагу і чого остерігатися (2-4 речення)",
+  "mood": "загальний настрій сну одним словом"
+}`;
+
+  try {
+    const res = await fetch('/api/openai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        max_tokens: 1000,
+        messages: [
+          { role: 'system', content: 'Ти — досвідчений аналітик снів. Відповідай виключно валідним JSON без markdown.' },
+          { role: 'user', content: prompt }
+        ]
+      })
+    });
+    const data = await res.json();
+    const raw = data.choices[0].message.content;
+    const clean = raw.replace(/```json|```/g, '').trim();
+    currentAnalysis = JSON.parse(clean);
+    renderAnalysis(currentAnalysis);
+  } catch (e) {
+    showToast('Помилка аналізу. Спробуй ще раз.');
+    console.error(e);
+  }
+
+  btn.disabled = false;
+  btnText.textContent = '🔮 Аналізувати ще раз';
+}
+
+function renderAnalysis(a) {
+  document.getElementById('rc-meaning').innerHTML = `
+    <h3>💫 Значення сну</h3>
+    <p>${htmlify(a.meaning)}</p>
+    <div class="tag-list">${(a.symbols||[]).map(s=>`<span class="tag">${s}</span>`).join('')}</div>`;
+  document.getElementById('rc-life').innerHTML = `
+    <h3>🔗 Зв'язок з реальністю</h3>
+    <p>${htmlify(a.lifeConnection)}</p>`;
+  document.getElementById('rc-advice').innerHTML = `
+    <h3>🌿 Поради</h3>
+    <p>${htmlify(a.advice)}</p>`;
+  document.getElementById('rc-caution').innerHTML = `
+    <h3>⚠️ На що звернути увагу</h3>
+    <p>${htmlify(a.caution)}</p>`;
+
+  document.getElementById('analysisResult').classList.add('show');
+  document.getElementById('analysisResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // reset tabs
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===0));
+  document.querySelectorAll('.tab-content').forEach((t,i) => t.classList.toggle('active', i===0));
+}
+
+// ── CHAT ──
+function startChat() {
+  if (!currentAnalysis) return;
+  chatHistory = [];
+  currentSessionId = Date.now().toString();
+
+  document.getElementById('chatContext').innerHTML =
+    `<strong>Твій сон:</strong> ${currentDream.slice(0,200)}${currentDream.length>200?'…':''}`;
+
+  const messages = document.getElementById('chatMessages');
+  messages.innerHTML = '';
+
+  const greeting = `Привіт! Я уважно проаналізував твій сон. 🌙\n\nКоротко: ${currentAnalysis.meaning.split('.')[0]}.\n\nМожеш запитати мене про будь-який аспект: символи, відчуття, зв'язок з реальністю — я тут, щоб допомогти розібратись.`;
+  addMessage('ai', greeting);
+
+  chatHistory.push({ role: 'assistant', content: greeting });
+  goPage('chat');
+}
+
+function addMessage(role, text) {
+  const messages = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const timeStr = new Date().toLocaleTimeString('uk-UA', {hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = `
+    <div class="msg-avatar">${role==='ai'?'🌙':'👤'}</div>
+    <div>
+      <div class="msg-bubble">${htmlify(text)}</div>
+      <div class="msg-time">${timeStr}</div>
+    </div>`;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function addTyping() {
+  const messages = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg ai'; div.id = 'typing';
+  div.innerHTML = `<div class="msg-avatar">🌙</div><div class="msg-bubble"><div class="typing-dot"><span></span><span></span><span></span></div></div>`;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = ''; input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+
+  addMessage('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  addTyping();
+
+  const systemPrompt = `Ти — м'який та мудрий аналітик снів. Веди діалог виключно українською мовою.
+Контекст сну: "${currentDream}"
+Аналіз: ${JSON.stringify(currentAnalysis)}
+Відповідай тепло, вдумливо, конкретно. Не повторюй весь аналіз — відповідай точно на питання.`;
+
+  const apiMessages = chatHistory.map(m => ({ role: m.role, content: m.content }));
+
+  try {
+    const res = await fetch('/api/openai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        max_tokens: 1000,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...apiMessages
+        ]
+      })
+    });
+    const data = await res.json();
+    const reply = data.choices[0].message.content;
+
+    document.getElementById('typing')?.remove();
+    addMessage('ai', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+
+    saveSession();
+  } catch (e) {
+    document.getElementById('typing')?.remove();
+    addMessage('ai', 'Вибач, сталась помилка. Спробуй ще раз.');
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+}
+
+// ── SESSIONS ──
+function saveSession() {
+  if (!currentUser) return;
+  const sessions = getSessions(currentUser.email);
+  const idx = sessions.findIndex(s => s.id === currentSessionId);
+  const session = {
+    id: currentSessionId,
+    date: now(),
+    dream: currentDream,
+    analysis: currentAnalysis,
+    chat: chatHistory,
+    updated: Date.now()
+  };
+  if (idx >= 0) sessions[idx] = session;
+  else sessions.unshift(session);
+  saveSessions(currentUser.email, sessions);
+}
+
+function renderCabinet() {
+  const sessions = getSessions(currentUser.email);
+  document.getElementById('cabinetSubtitle').textContent =
+    `${sessions.length} збережених ${sessions.length===1?'сесія':'сесій'}`;
+
+  const list = document.getElementById('sessionsList');
+  if (sessions.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="icon">🌙</div>
+      <h3>Щоденник порожній</h3>
+      <p>Проаналізуй свій перший сон і він з'явиться тут</p>
+    </div>`;
+    return;
+  }
+  list.innerHTML = sessions.map(s => `
+    <div class="session-card" onclick="viewSession('${s.id}')">
+      <div>
+        <div class="session-date">📅 ${s.date}</div>
+        <div class="session-dream">${s.dream}</div>
+        <div class="session-meta">🌀 ${s.analysis?.mood || ''} · символи: ${(s.analysis?.symbols||[]).slice(0,3).join(', ')}</div>
+      </div>
+      <div class="session-msgs">💬 ${Math.floor((s.chat?.length||0)/2)} запит.</div>
+    </div>`).join('');
+}
+
+function viewSession(id) {
+  if (!currentUser) return;
+  const sessions = getSessions(currentUser.email);
+  const s = sessions.find(x => x.id === id);
+  if (!s) return;
+
+  const detail = document.getElementById('sessionDetail');
+  detail.innerHTML = `
+    <div style="margin-bottom:24px;">
+      <p style="color:var(--muted);font-size:0.8rem;margin-bottom:8px;">📅 ${s.date}</p>
+      <div class="result-card" style="margin-bottom:16px;">
+        <h3>🌙 Сон</h3>
+        <p style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;line-height:1.8;">${s.dream}</p>
+      </div>
+      <div class="result-card" style="margin-bottom:16px;">
+        <h3>💫 Значення</h3>
+        <p>${htmlify(s.analysis?.meaning||'')}</p>
+        <div class="tag-list">${(s.analysis?.symbols||[]).map(sym=>`<span class="tag">${sym}</span>`).join('')}</div>
+      </div>
+      <div class="result-card" style="margin-bottom:16px;">
+        <h3>🔗 Зв'язок з реальністю</h3>
+        <p>${htmlify(s.analysis?.lifeConnection||'')}</p>
+      </div>
+      <div class="result-card" style="margin-bottom:16px;">
+        <h3>🌿 Поради</h3>
+        <p>${htmlify(s.analysis?.advice||'')}</p>
+      </div>
+      <div class="result-card" style="margin-bottom:24px;">
+        <h3>⚠️ Застереження</h3>
+        <p>${htmlify(s.analysis?.caution||'')}</p>
+      </div>
+      ${s.chat && s.chat.length > 0 ? `
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--accent3);margin-bottom:16px;">💬 Діалог</h2>
+      <div class="chat-messages" style="pointer-events:none;">
+        ${s.chat.map(m => `
+          <div class="msg ${m.role==='user'?'user':'ai'}" style="max-width:85%;">
+            <div class="msg-avatar">${m.role==='user'?'👤':'🌙'}</div>
+            <div><div class="msg-bubble">${htmlify(m.content)}</div></div>
+          </div>`).join('')}
+      </div>` : ''}
+    </div>`;
+
+  goPage('session');
+}
+
+// ── INIT ──
+initAuth();
+</script>
+</body>
+</html>
