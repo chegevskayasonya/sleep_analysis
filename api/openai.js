@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   }
 
   // Check API key is configured
-  if (!process.env.OPENAI_API_KEY2) {
+  if (!process.env.OPENAI_API_KEY) {
     return res.status(500).json({ error: 'OPENAI_API_KEY2 is not configured' });
   }
 
